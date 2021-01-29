@@ -2,6 +2,7 @@ const express = require('express')
 const dotenv = require('dotenv')
 const connectDB = require('./config/db')
 const courseRoutes = require('./routes/courseRoutes')
+const errorHandler = require('./middleware/errorMiddleare')
 
 dotenv.config()
 
@@ -13,6 +14,8 @@ app.use(express.json())
 
 // Routes
 app.use('/api/v1/courses', courseRoutes)
+
+app.use(errorHandler)
 
 const PORT = process.env.PORT
 
