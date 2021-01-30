@@ -9,24 +9,19 @@ const Course = require('../models/courseModel')
 // @access public
 
 const getCoursesSpecialization = asyncHandler(async (req, res, next) => {
-	let query
-
 	if (req.params.courseId) {
-		query = CourseSpecialization.find({ course: req.params.courseId })
-	} else {
-		query = CourseSpecialization.find().populate({
-			path: 'course',
-			select: 'name description',
+		const courses = await CourseSpecialization.find({
+			course: req.params.courseId,
 		})
+
+		res.status(200).json({
+			success: true,
+			count: courses.length,
+			data: courses,
+		})
+	} else {
+		res.status(200).json(res.advancedResultMiddleware)
 	}
-
-	const coursespecialization = await query
-
-	res.status(200).json({
-		success: true,
-		count: coursespecialization.length,
-		data: coursespecialization,
-	})
 })
 
 // @desc Get single course specialization
