@@ -29,7 +29,7 @@ const coursespecialization = JSON.parse(
 const importData = async () => {
 	try {
 		await Course.create(course)
-		await Coursepecialization.create(coursespecialization)
+		// await Coursepecialization.create(coursespecialization)
 		console.log('Data imported')
 		process.exit()
 	} catch (error) {
