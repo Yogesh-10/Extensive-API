@@ -25,7 +25,7 @@ const getAllCourses = asyncHandler(async (req, res, next) => {
 	querystr = querystr.replace(/\b(gt|gte|lt|lte|in)\b/g, (match) => `$${match}`)
 
 	// Finding resource
-	query = Course.find(JSON.parse(querystr))
+	query = Course.find(JSON.parse(querystr)).populate('coursespecialization')
 
 	// select fields
 	if (req.query.select) {
@@ -43,7 +43,7 @@ const getAllCourses = asyncHandler(async (req, res, next) => {
 
 	// pagination-limit
 	const page = parseInt(req.query.page, 10) || 1
-	const limit = parseInt(req.query.limit, 10) || 1
+	const limit = parseInt(req.query.limit, 10) || 20
 	const startIndex = (page - 1) * limit
 	const endIndex = page * limit
 	const total = await Course.countDocuments()
@@ -128,10 +128,12 @@ const updateCourse = asyncHandler(async (req, res, next) => {
 // @access private
 const deleteCourse = asyncHandler(async (req, res, next) => {
 	// findByIdAndUpdate first parameter is url, second is what we want to update from body, third is inserting updated new value to DB
-	const course = await Course.findByIdAndDelete(req.params.id)
+	const course = await Course.findById(req.params.id)
 	if (!course) {
 		return new ErrorResponse(`Course not found with id of ${req.params.id}`)
 	}
+
+	course.remove() //this triggers pre.remove middleware in courseModel
 	res.json({
 		success: true,
 	})

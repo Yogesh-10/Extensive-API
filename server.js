@@ -2,6 +2,7 @@ const express = require('express')
 const dotenv = require('dotenv')
 const connectDB = require('./config/db')
 const courseRoutes = require('./routes/courseRoutes')
+const courseSpecializationRoutes = require('./routes/courseSpecializationRoutes')
 const errorHandler = require('./middleware/errorMiddleare')
 
 dotenv.config()
@@ -14,6 +15,7 @@ app.use(express.json())
 
 // Routes
 app.use('/api/v1/courses', courseRoutes)
+app.use('/api/v1/course-specialization', courseSpecializationRoutes)
 
 app.use(errorHandler)
 
