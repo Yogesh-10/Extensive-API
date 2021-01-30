@@ -4,7 +4,7 @@ const dotenv = require('dotenv')
 const connectDB = require('./config/db')
 const courseRoutes = require('./routes/courseRoutes')
 const courseSpecializationRoutes = require('./routes/courseSpecializationRoutes')
-const errorHandler = require('./middleware/errorMiddleare')
+const errorHandler = require('./middleware/errorMiddleware')
 const fileUpload = require('express-fileupload')
 
 dotenv.config()
