@@ -7,6 +7,7 @@ const {
 	updateCourse,
 	deleteCourse,
 	getCourseInRadius,
+	coursePhotoUpload,
 } = require('../controller/courseController')
 const courseSpecializationRoutes = require('./courseSpecializationRoutes')
 
@@ -14,6 +15,9 @@ const courseSpecializationRoutes = require('./courseSpecializationRoutes')
 router.use('/:courseId/course-specialization', courseSpecializationRoutes)
 
 router.route('/radius/:zipcode/:distance').get(getCourseInRadius)
+
+router.route('/:id/photo').put(coursePhotoUpload)
+
 router.route('/').get(getAllCourses).post(createCourse)
 router.route('/:id').get(getCourse).put(updateCourse).delete(deleteCourse)
 

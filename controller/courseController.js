@@ -1,3 +1,4 @@
+const path = require('path')
 const asyncHandler = require('express-async-handler')
 const geocoder = require('../utils/geocoder')
 const ErrorResponse = require('../utils/errorResponse')
@@ -127,7 +128,6 @@ const updateCourse = asyncHandler(async (req, res, next) => {
 // @route PUT/api/v1/courses/:id
 // @access private
 const deleteCourse = asyncHandler(async (req, res, next) => {
-	// findByIdAndUpdate first parameter is url, second is what we want to update from body, third is inserting updated new value to DB
 	const course = await Course.findById(req.params.id)
 	if (!course) {
 		return new ErrorResponse(`Course not found with id of ${req.params.id}`)
@@ -165,6 +165,53 @@ const getCourseInRadius = asyncHandler(async (req, res, next) => {
 	})
 })
 
+// @desc upload photo
+// @route PUT/api/v1/courses/:id/photo
+// @access private
+const coursePhotoUpload = asyncHandler(async (req, res, next) => {
+	const course = await Course.findById(req.params.id)
+	if (!course) {
+		return new ErrorResponse(`Course not found with id of ${req.params.id}`)
+	}
+
+	if (!req.files) {
+		return next(new ErrorResponse(`Please upload a file`, 400))
+	}
+
+	const file = req.files.file
+
+	if (!file.mimetype.startsWith('image')) {
+		return next(new ErrorResponse(`Please upload a image file`, 400))
+	}
+
+	// check file size
+	if (file.size > process.env.MAX_FILE_UPLOAD) {
+		return next(
+			new ErrorResponse(
+				`Please upload a image less than ${process.env.MAX_FILE_UPLOAD}`,
+				400
+			)
+		)
+	}
+
+	// create custom filename
+	file.name = `photo_${course._id}${path.parse(file.name).ext}`
+
+	file.mv(`${process.env.FILE_UPLOAD_PATH}/${file.name}`, async (err) => {
+		if (err) {
+			console.error(error)
+			return next(new ErrorResponse(`problem with file upload`, 500))
+		}
+
+		await Course.findByIdAndUpdate(req.params.id, { photo: file.name })
+	})
+
+	res.json({
+		success: true,
+		data: file.name,
+	})
+})
+
 module.exports = {
 	getAllCourses,
 	getCourse,
@@ -172,4 +219,5 @@ module.exports = {
 	updateCourse,
 	deleteCourse,
 	getCourseInRadius,
+	coursePhotoUpload,
 }
