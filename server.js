@@ -4,8 +4,10 @@ const dotenv = require('dotenv')
 const connectDB = require('./config/db')
 const courseRoutes = require('./routes/courseRoutes')
 const courseSpecializationRoutes = require('./routes/courseSpecializationRoutes')
+const authRoutes = require('./routes/authRoutes')
 const errorHandler = require('./middleware/errorMiddleware')
 const fileUpload = require('express-fileupload')
+const cookieParser = require('cookie-parser')
 
 dotenv.config()
 
@@ -16,6 +18,7 @@ const app = express()
 app.use(express.json())
 
 app.use(fileUpload())
+app.use(cookieParser())
 
 // static folder
 app.use(express.static(path.join(__dirname, 'public')))
@@ -23,6 +26,7 @@ app.use(express.static(path.join(__dirname, 'public')))
 // Routes
 app.use('/api/v1/courses', courseRoutes)
 app.use('/api/v1/course-specialization', courseSpecializationRoutes)
+app.use('/api/v1/auth', authRoutes)
 
 app.use(errorHandler)
 
