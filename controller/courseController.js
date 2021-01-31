@@ -32,6 +32,22 @@ const getCourse = asyncHandler(async (req, res, next) => {
 // @route PUT/api/v1/courses
 // @access private
 const createCourse = asyncHandler(async (req, res, next) => {
+	// Add user to req.body
+	req.body.user = req.user.id
+
+	// check for published bootcamp
+	const publishedCourse = await Course.findOne({ user: req.user.id })
+
+	// If user is not admin, can only add one course
+	if (publishedCourse && req.user.role != 'admin') {
+		return next(
+			new ErrorResponse(
+				`The user with ${req.user.id} already published a course`,
+				400
+			)
+		)
+	}
+
 	const newCourse = await Course.create(req.body)
 	res.status(201).json({
 		success: true,
@@ -44,22 +60,33 @@ const createCourse = asyncHandler(async (req, res, next) => {
 // @access private
 const updateCourse = asyncHandler(async (req, res, next) => {
 	// findByIdAndUpdate first parameter is url, second is what we want to update from body, third is inserting updated new value to DB
-	const course = await Course.findByIdAndUpdate(req.params.id, req.body, {
-		new: true,
-		runValidators: true,
-	})
+	let course = await Course.findById(req.params.id)
 
 	if (!course) {
 		return new ErrorResponse(`Course not found with id of ${req.params.id}`)
 	}
-	res.json({
+
+	// check if user is course owner
+	if (course.user.toString() !== req.user.id && req.user.role !== 'admin') {
+		return new ErrorResponse(
+			`User ${req.user.id} not athorized to update course`,
+			401
+		)
+	}
+
+	course = await Course.findByIdAndUpdate(req.params.id, req.body, {
+		new: true,
+		runValidators: true,
+	})
+
+	res.status(200).json({
 		success: true,
-		msg: course,
+		data: course,
 	})
 })
 
 // @desc delete courses
-// @route PUT/api/v1/courses/:id
+// @route DELETE/api/v1/courses/:id
 // @access private
 const deleteCourse = asyncHandler(async (req, res, next) => {
 	const course = await Course.findById(req.params.id)
@@ -67,7 +94,15 @@ const deleteCourse = asyncHandler(async (req, res, next) => {
 		return new ErrorResponse(`Course not found with id of ${req.params.id}`)
 	}
 
-	course.remove() //this triggers pre.remove middleware in courseModel
+	// check if user is course owner
+	if (course.user.toString() !== req.user.id && req.user.role !== 'admin') {
+		return new ErrorResponse(
+			`User ${req.user.id} not athourized to delete course`,
+			401
+		)
+	}
+
+	course.deleteOne() //this triggers pre.remove middleware in courseModel
 	res.json({
 		success: true,
 	})
@@ -106,6 +141,14 @@ const coursePhotoUpload = asyncHandler(async (req, res, next) => {
 	const course = await Course.findById(req.params.id)
 	if (!course) {
 		return new ErrorResponse(`Course not found with id of ${req.params.id}`)
+	}
+
+	// check if user is course owner
+	if (course.user.toString() !== req.user.id && req.user.role !== 'admin') {
+		return new ErrorResponse(
+			`User ${req.user.id} not athourized to delete course`,
+			401
+		)
 	}
 
 	if (!req.files) {
