@@ -10,12 +10,14 @@ const {
 	coursePhotoUpload,
 } = require('../controller/courseController')
 const courseSpecializationRoutes = require('./courseSpecializationRoutes')
+const reviewRoutes = require('./reviewRoutes')
 const advancedResultMiddleware = require('../middleware/advancedResultMiddleware')
 const Course = require('../models/courseModel')
 const { protect, authorize } = require('../middleware/authMiddleware')
 
 // Re route in to other resource routers
 router.use('/:courseId/course-specialization', courseSpecializationRoutes)
+router.use('/:courseId/reviews', reviewRoutes)
 
 router.route('/radius/:zipcode/:distance').get(getCourseInRadius)
 
