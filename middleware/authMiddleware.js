@@ -39,7 +39,10 @@ const authorize = (...roles) => {
 	return (req, res, next) => {
 		if (!roles.includes(req.user.role)) {
 			return next(
-				new ErrorResponse(`Not authorized to acess this resource`, 403) //403 - forbidden
+				new ErrorResponse(
+					`user role ${req.user.role} is not authorized to acess this resource`,
+					403
+				) //403 - forbidden
 			)
 		}
 		next()
