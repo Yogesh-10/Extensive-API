@@ -8,6 +8,7 @@ const {
 } = require('../controller/courseSpecializationController')
 const Coursespecialization = require('../models/coursespecializationModel')
 const advancedResultMiddleware = require('../middleware/advancedResultMiddleware')
+const { protect, authorize } = require('../middleware/authMiddleware')
 
 const router = express.Router({ mergeParams: true })
 
@@ -20,11 +21,12 @@ router
 		}),
 		getCoursesSpecialization
 	)
-	.post(createCourseSpecialization)
+	.post(protect, authorize('publisher', 'admin'), createCourseSpecialization)
 
 router
 	.route('/:id')
 	.get(getCourseSpecialization)
-	.put(updateCourseSpecialization)
-	.delete(deleteCourseSpecialization)
+	.put(protect, authorize('publisher', 'admin'), updateCourseSpecialization)
+	.delete(protect, authorize('publisher', 'admin'), deleteCourseSpecialization)
+
 module.exports = router

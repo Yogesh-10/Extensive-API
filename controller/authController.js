@@ -66,4 +66,12 @@ const login = asyncHandler(async (req, res, next) => {
 	sendTokenResponse(user, 200, res)
 })
 
-module.exports = { register, login }
+// @desc      Get current logged in user
+// @route     POST /api/v1/auth/me
+// @access    Private
+const getMe = asyncHandler(async (req, res, next) => {
+	const user = await User.findById(req.user.id)
+	res.status(200).json({ success: true, data: user })
+})
+
+module.exports = { register, login, getMe }
