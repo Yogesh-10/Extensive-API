@@ -54,6 +54,7 @@ const getCourseSpecialization = asyncHandler(async (req, res, next) => {
 
 const createCourseSpecialization = asyncHandler(async (req, res, next) => {
 	req.body.course = req.params.courseId
+	req.body.user = req.user.id
 
 	const course = await Course.findById(req.params.courseId)
 
@@ -63,6 +64,14 @@ const createCourseSpecialization = asyncHandler(async (req, res, next) => {
 				`No Courses Available with id of ${req.params.courseId}`
 			),
 			404
+		)
+	}
+
+	// check if user is course owner
+	if (course.user.toString() !== req.user.id && req.user.role !== 'admin') {
+		return new ErrorResponse(
+			`User ${req.user.id} not athourized to add course-specialization to ${course._id}`,
+			401
 		)
 	}
 
@@ -84,6 +93,14 @@ const updateCourseSpecialization = asyncHandler(async (req, res, next) => {
 		return next(
 			new ErrorResponse(`No Courses Available with id of ${req.params.id}`),
 			404
+		)
+	}
+
+	// check if user is course owner
+	if (course.user.toString() !== req.user.id && req.user.role !== 'admin') {
+		return new ErrorResponse(
+			`User ${req.user.id} not athourized to update course-specialization to ${course._id}`,
+			401
 		)
 	}
 
@@ -112,6 +129,14 @@ const deleteCourseSpecialization = asyncHandler(async (req, res, next) => {
 		return next(
 			new ErrorResponse(`No Courses Available with id of ${req.params.id}`),
 			404
+		)
+	}
+
+	// check if user is course owner
+	if (course.user.toString() !== req.user.id && req.user.role !== 'admin') {
+		return new ErrorResponse(
+			`User ${req.user.id} not athourized to update course-specialization to ${course._id}`,
+			401
 		)
 	}
 
