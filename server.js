@@ -53,6 +53,8 @@ app.use(cors())
 // static folder
 app.use(express.static(path.join(__dirname, 'public')))
 
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')))
+
 // Routes
 app.use('/api/v1/courses', courseRoutes)
 app.use('/api/v1/course-specialization', courseSpecializationRoutes)
